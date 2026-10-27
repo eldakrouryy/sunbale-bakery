@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<script>
+  /* apply saved / system theme before paint to avoid a flash */
+  (function () {
+    let t = null;
+    try { t = localStorage.getItem("sunbula-theme"); } catch (e) {}
+    if (!t) t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مخبز السنبلة</title>
+<meta name="description" content="مخبز السنبلة: عيش وحلويات طازة كل يوم، من فرننا لبيتك.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Lalezar&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --white: #ffffff;
+    --cream: #fff8ec;
+    --gold-1: #f6d79a;
+    --gold-2: #e3a94f;
+    --crust: #c07a2c;
+    --brown: #8a4f1d;
+    --dark: #4a2a10;
+    --ink: #3b2412;
+    --muted: #8b6f57;
+    --line: #f0e2c8;
+    --ok: #2f8f4e;
+    --bad: #c0392b;
+    --shadow: 0 18px 40px -18px rgba(138, 79, 29, .45);
+    --radius: 22px;
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --heading: #4a2a10;
+    --nav-bg: rgba(255, 255, 255, .78);
+    --ok-bg: #e8f6ec;
+    --bad-bg: #fdecea;
+    --glow: rgba(246, 215, 154, .55);
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    --cream: #2b1f14;
+    --brown: #e9b46a;
+    --ink: #f5e6cf;
+    --muted: #c2a585;
+    --line: #3e2d1d;
+    --ok: #5fd08a;
+    --bad: #ff7b6b;
+    --shadow: 0 18px 40px -18px rgba(0, 0, 0, .7);
+    --bg: #17100a;
+    --surface: #221811;
+    --heading: #f6d79a;
+    --nav-bg: rgba(23, 16, 10, .8);
+    --ok-bg: #173323;
+    --bad-bg: #3a1a16;
+    --glow: rgba(227, 169, 79, .22);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: "Cairo", system-ui, sans-serif;
+    color: var(--ink);
+    background: linear-gradient(180deg, var(--bg) 0%, var(--cream) 40%, var(--bg) 100%);
+    overflow-x: hidden;
+    transition: background-color .4s, color .4s;
+  }
+  h1, h2, h3, .display { font-family: "Lalezar", "Cairo", sans-serif; font-weight: 400; letter-spacing: 0; }
+  a { color: inherit; }
+  button { font-family: inherit; cursor: pointer; }
+  .wrap { width: min(1120px, 100% - 32px); margin-inline: auto; }
+
+  /* ---------- nav ---------- */
+  .nav {
+    position: fixed; inset: 0 0 auto 0; z-index: 50;
+    backdrop-filter: blur(10px);
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-end { display: flex; align-items: center; gap: 10px; }
+  .theme-btn {
+    width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--line);
+    background: var(--surface); color: var(--brown); font-size: 1.2rem; display: grid; place-items: center;
+    transition: transform .4s cubic-bezier(.2, .8, .2, 1.4);
+  }
+  .theme-btn:hover { transform: rotate(25deg) scale(1.08); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; font-family: "Lalezar"; font-size: 1.6rem; color: var(--brown); }
+  .brand svg { width: 34px; height: 34px; }
+  .nav-links { display: flex; gap: 22px; }
+  .nav-links a { text-decoration: none; font-weight: 600; color: var(--muted); transition: color .2s; }
+  .nav-links a:hover { color: var(--brown); }
+  .cart-btn {
+    position: relative; border: 0; border-radius: 999px; padding: 10px 18px;
+    background: linear-gradient(135deg, var(--gold-2), var(--crust)); color: #fff; font-weight: 700;
+    box-shadow: var(--shadow); display: flex; align-items: center; gap: 8px;
+  }
+  .cart-count {
+    background: #fff; color: var(--brown); border-radius: 999px; min-width: 24px; height: 24px;
+    display: grid; place-items: center; font-size: .85rem; padding: 0 6px;
+  }
+  .cart-btn.bump { animation: bump .45s ease; }
+  @keyframes bump { 30% { transform: scale(1.15) rotate(-4deg); } 60% { transform: scale(.95); } }
+
+  /* ---------- hero (scroll-eaten croissant) ---------- */
+  .hero { height: 420vh; position: relative; }
+  .hero-stick {
+    position: sticky; top: 0; height: 100vh; overflow: hidden;
+    display: grid; grid-template-columns: 1fr 1.1fr; align-items: center; gap: 24px;
+    padding: 80px max(16px, calc((100% - 1120px) / 2)) 24px;
+    background:
+      radial-gradient(circle at 25% 55%, var(--glow), transparent 55%),
+      radial-gradient(circle at 90% 10%, rgba(227, 169, 79, .18), transparent 40%),
+      var(--bg);
+  }
+  .hero-text .badge {
+    display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--line); font-weight: 700; font-size: .9rem; box-shadow: var(--shadow);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); }
+  .dot.open { background: var(--ok); box-shadow: 0 0 0 0 rgba(47, 143, 78, .6); animation: pulse 3.6s infinite; }
+  .dot.closed { background: var(--bad); }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 10px rgba(47, 143, 78, 0); } 100% { box-shadow: 0 0 0 0 rgba(47, 143, 78, 0); } }
+  .hero h1 {
+    font-size: clamp(3rem, 8vw, 6.2rem); line-height: 1.05; margin: 18px 0 10px;
+    background: linear-gradient(120deg, var(--gold-2), var(--crust) 45%, var(--heading));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p.lead { font-size: clamp(1.1rem, 2.4vw, 1.45rem); color: var(--muted); margin: 0 0 28px; max-width: 30ch; }
+  .cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn {
+    border: 0; border-radius: 999px; padding: 14px 26px; font-weight: 700; font-size: 1.05rem;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: transform .2s, box-shadow .2s;
+  }
+  .btn:hover { transform: translateY(-3px); }
+  .btn-main { background: linear-gradient(135deg, var(--gold-2), var(--crust)); color: #fff; box-shadow: var(--shadow); }
+  .btn-ghost { background: var(--surface); color: var(--brown); border: 2px solid var(--gold-1); }
+
+  .bite-stage { position: relative; display: grid; place-items: center; }
+  .croissant { width: min(560px, 100%); filter: drop-shadow(0 30px 30px rgba(138, 79, 29, .35)); animation: float 10s ease-in-out infinite; }
+  @keyframes float { 50% { transform: translateY(-14px) rotate(-2deg); } }
+  .bite-label {
+    position: absolute; bottom: 4%; left: 50%; transform: translateX(-50%);
+    background: var(--dark); color: #fff; padding: 8px 18px; border-radius: 999px; font-weight: 700;
+    white-space: nowrap; transition: opacity .3s; box-shadow: var(--shadow);
+  }
+  .bite-label.swap { animation: pop .8s ease; }
+  @keyframes pop { 0% { transform: translateX(-50%) scale(.7); opacity: 0; } 100% { transform: translateX(-50%) scale(1); opacity: 1; } }
+  .crumb { position: absolute; border-radius: 40%; background: var(--crust); pointer-events: none; animation: fall 2.2s ease-in forwards; }
+  @keyframes fall { to { transform: translate(var(--dx), 260px) rotate(320deg); opacity: 0; } }
+  .scroll-hint {
+    position: absolute; bottom: 18px; right: 50%; transform: translateX(50%); color: var(--muted); font-size: .9rem;
+    display: flex; flex-direction: column; align-items: center; gap: 4px; animation: hint 3.2s ease-in-out infinite;
+  }
+  @keyframes hint { 50% { transform: translate(50%, 6px); } }
+
+  /* floating wheat in the background */
+  .wheat { position: absolute; opacity: .18; width: 60px; animation: drift linear infinite; }
+  @keyframes drift { from { transform: translateY(110vh) rotate(0); } to { transform: translateY(-20vh) rotate(200deg); } }
+
+  /* ---------- sections ---------- */
+  section.block { padding: 90px 0; position: relative; }
+  .section-head { text-align: center; margin-bottom: 44px; }
+  .section-head h2 { font-size: clamp(2.2rem, 5vw, 3.2rem); margin: 0; color: var(--brown); }
+  .section-head p { color: var(--muted); margin: 6px 0 0; font-size: 1.1rem; }
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity .7s ease, transform .7s cubic-bezier(.2, .8, .2, 1); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* products */
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px;
+    box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .card::before {
+    content: ""; position: absolute; inset: 0 0 auto 0; height: 150px;
+    background: linear-gradient(180deg, var(--glow), transparent);
+  }
+  .card:hover { transform: translateY(-8px) rotate(-.5deg); box-shadow: 0 30px 50px -22px rgba(138, 79, 29, .55); }
+  .card .art { height: 140px; display: grid; place-items: center; position: relative; }
+  .card .art svg { width: 150px; height: 120px; transition: transform .4s cubic-bezier(.2, .8, .2, 1.4); }
+  .card:hover .art svg { transform: scale(1.12) rotate(-6deg); }
+  .card h3 { margin: 4px 0 0; font-size: 1.7rem; color: var(--heading); }
+  .card .unit { color: var(--muted); font-size: .95rem; }
+  .card .price { font-family: "Lalezar"; font-size: 1.9rem; color: var(--crust); }
+  .card .note { font-size: .9rem; color: var(--brown); background: var(--cream); border-radius: 12px; padding: 6px 10px; }
+  .card .actions { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .qty { display: flex; align-items: center; border: 2px solid var(--line); border-radius: 999px; overflow: hidden; }
+  .qty button { width: 38px; height: 38px; border: 0; background: var(--surface); font-size: 1.3rem; color: var(--brown); }
+  .qty button:hover { background: var(--cream); }
+  .qty span { min-width: 30px; text-align: center; font-weight: 700; }
+  .add { border: 0; border-radius: 999px; padding: 10px 18px; background: var(--dark); border: 1px solid var(--line); color: #fff; font-weight: 700; transition: background .2s, transform .2s; }
+  .add:hover { background: var(--crust); transform: scale(1.04); }
+  .fly { position: fixed; z-index: 80; width: 46px; height: 46px; pointer-events: none; transition: transform .8s cubic-bezier(.5, -.4, .7, 1), opacity .8s; }
+
+  /* info strip */
+  .info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .info .tile { background: var(--surface); border-radius: var(--radius); padding: 26px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .info .tile h3 { margin: 0 0 12px; color: var(--brown); font-size: 1.6rem; }
+  .info table { width: 100%; border-collapse: collapse; }
+  .info td { padding: 8px 0; border-bottom: 1px dashed var(--line); }
+  .info td:last-child { text-align: left; font-weight: 700; }
+  .info ul { margin: 0; padding-inline-start: 18px; line-height: 2; }
+  .info tr.today td { color: var(--crust); }
+
+  /* order */
+  .order { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; align-items: start; }
+  .panel { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--line); padding: 26px; box-shadow: var(--shadow); }
+  .panel h3 { margin: 0 0 14px; font-size: 1.7rem; color: var(--brown); }
+  .cart-list { list-style: none; padding: 0; margin: 0; }
+  .cart-list li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--line); animation: slideIn .35s ease; }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } }
+  .cart-list .rm { border: 0; background: none; color: var(--bad); font-size: 1.2rem; }
+  .empty { color: var(--muted); text-align: center; padding: 26px 0; }
+  .empty svg { width: 90px; opacity: .55; display: block; margin: 0 auto 8px; }
+  .totals { margin-top: 14px; display: grid; gap: 6px; }
+  .totals .row { display: flex; justify-content: space-between; }
+  .totals .grand { font-family: "Lalezar"; font-size: 1.7rem; color: var(--crust); }
+  form { display: grid; gap: 14px; }
+  label { font-weight: 600; display: grid; gap: 6px; }
+  input, textarea {
+    font: inherit; color: var(--ink); padding: 12px 14px; border-radius: 14px; border: 2px solid var(--line); background: var(--cream);
+    transition: border-color .2s, background .2s;
+  }
+  input:focus, textarea:focus { outline: none; border-color: var(--gold-2); background: var(--surface); }
+  .seg { display: flex; gap: 8px; flex-wrap: wrap; }
+  .seg input { display: none; }
+  .seg label { display: block; cursor: pointer; padding: 10px 16px; border-radius: 999px; border: 2px solid var(--line); font-weight: 700; color: var(--muted); transition: all .2s; }
+  .seg input:checked + label { background: linear-gradient(135deg, var(--gold-2), var(--crust)); color: #fff; border-color: transparent; }
+  .status { border-radius: 14px; padding: 12px 14px; font-weight: 600; display: none; }
+  .status.ok { display: block; background: var(--ok-bg); color: var(--ok); }
+  .status.err { display: block; background: var(--bad-bg); color: var(--bad); }
+  .fineprint { color: var(--muted); font-size: .9rem; margin: 0; }
+
+  /* trust strip */
+  .trust { padding: 34px 0 0; }
+  .trust-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .trust-item {
+    display: flex; align-items: center; gap: 14px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow);
+  }
+  .trust-item .ti {
+    font-size: 1.8rem; width: 54px; height: 54px; flex: none; display: grid; place-items: center; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+  }
+  .trust-item b { display: block; color: var(--heading); }
+  .trust-item small { color: var(--muted); font-size: .92rem; }
+
+  /* how to order */
+  .steps { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; position: relative; }
+  .steps::before { content: ""; position: absolute; top: 34px; inset-inline: 16%; border-top: 3px dashed var(--gold-1); }
+  .step { position: relative; text-align: center; padding: 0 10px; }
+  .step .num {
+    width: 68px; height: 68px; margin: 0 auto 12px; border-radius: 50%; display: grid; place-items: center; position: relative;
+    font-family: "Lalezar"; font-size: 2rem; color: #fff; background: linear-gradient(135deg, var(--gold-2), var(--crust)); box-shadow: var(--shadow);
+  }
+  .step.in .num { animation: stepPop .9s cubic-bezier(.2, .8, .2, 1.4); }
+  @keyframes stepPop { 0% { transform: scale(.4) rotate(-30deg); } }
+  .step h3 { margin: 0 0 6px; color: var(--heading); font-size: 1.6rem; }
+  .step p { margin: 0; color: var(--muted); }
+  .steps-note { text-align: center; margin: 30px auto 0; color: var(--brown); font-weight: 700; }
+
+  /* faq */
+  .narrow { width: min(820px, 100% - 32px); }
+  .faq { display: grid; gap: 12px; }
+  .faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); overflow: hidden; }
+  .faq summary {
+    list-style: none; cursor: pointer; padding: 18px 22px; font-weight: 700;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; font-size: 1.6rem; color: var(--crust); transition: transform .3s; line-height: 1; }
+  .faq details[open] summary::after { transform: rotate(45deg); }
+  .faq details p { margin: 0; padding: 0 22px 18px; color: var(--muted); animation: faqIn .35s ease; }
+  @keyframes faqIn { from { opacity: 0; transform: translateY(-6px); } }
+
+  /* delivery-minimum progress */
+  .goal { margin-top: 14px; }
+  .goal-text { font-weight: 700; color: var(--brown); margin-bottom: 8px; font-size: .95rem; }
+  .goal.done .goal-text { color: var(--ok); }
+  .goal-bar { height: 12px; border-radius: 999px; background: var(--cream); border: 1px solid var(--line); overflow: hidden; }
+  .goal-bar span {
+    display: block; height: 100%; width: 0; border-radius: inherit;
+    background: linear-gradient(90deg, var(--gold-1), var(--gold-2), var(--crust)); transition: width .6s cubic-bezier(.2, .8, .2, 1);
+  }
+  .goal.done .goal-bar span { background: linear-gradient(90deg, #7fd39b, var(--ok)); }
+  .date-hint { font-weight: 400; color: var(--muted); font-size: .88rem; }
+
+  footer { background: linear-gradient(135deg, #8a4f1d, #4a2a10); color: #fbe9cc; padding: 40px 0; margin-top: 60px; }
+  footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; align-items: center; }
+  footer .display { font-size: 2rem; color: var(--gold-1); }
+
+  /* toast */
+  .toast {
+    position: fixed; bottom: 22px; left: 50%; transform: translate(-50%, 140%); z-index: 90;
+    background: var(--dark); color: #fff; padding: 12px 22px; border-radius: 999px; font-weight: 700;
+    transition: transform .4s cubic-bezier(.2, .8, .2, 1.3); box-shadow: var(--shadow);
+  }
+  .toast.show { transform: translate(-50%, 0); }
+
+  @media (max-width: 900px) {
+    .grid, .info { grid-template-columns: repeat(2, 1fr); }
+    .order { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 720px) {
+    .nav-links { display: none; }
+    .hero-stick { grid-template-columns: 1fr; grid-template-rows: auto 1fr; text-align: center; padding-top: 84px; gap: 0; }
+    .hero-text { order: 2; }
+    .hero p.lead { margin-inline: auto; }
+    .cta-row { justify-content: center; }
+    .bite-stage { order: 1; }
+    .croissant { width: min(380px, 92%); }
+    .grid, .info { grid-template-columns: 1fr; }
+    .hero h1 { margin-top: 10px; }
+    .trust-row, .steps { grid-template-columns: 1fr; }
+    .steps::before { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- reusable drawings -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="crustG" cx="40%" cy="30%" r="80%">
+      <stop offset="0" stop-color="#f9dfa6"/>
+      <stop offset=".45" stop-color="#e3a94f"/>
+      <stop offset="1" stop-color="#9a5a22"/>
+    </radialGradient>
+    <linearGradient id="chocoG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6b3a1a"/><stop offset="1" stop-color="#3a1d0b"/>
+    </linearGradient>
+    <symbol id="wheat" viewBox="0 0 40 100">
+      <path d="M20 100 V20" stroke="#c07a2c" stroke-width="3" fill="none"/>
+      <g fill="#e3a94f">
+        <ellipse cx="13" cy="30" rx="6" ry="11" transform="rotate(-25 13 30)"/>
+        <ellipse cx="27" cy="30" rx="6" ry="11" transform="rotate(25 27 30)"/>
+        <ellipse cx="13" cy="50" rx="6" ry="11" transform="rotate(-25 13 50)"/>
+        <ellipse cx="27" cy="50" rx="6" ry="11" transform="rotate(25 27 50)"/>
+        <ellipse cx="13" cy="70" rx="6" ry="11" transform="rotate(-25 13 70)"/>
+        <ellipse cx="27" cy="70" rx="6" ry="11" transform="rotate(25 27 70)"/>
+        <ellipse cx="20" cy="12" rx="6" ry="12"/>
+      </g>
+    </symbol>
+    <symbol id="croissantSm" viewBox="-220 -140 440 280">
+      <g fill="url(#crustG)" stroke="#9a5a22" stroke-width="6">
+        <ellipse cx="-165" cy="40" rx="45" ry="30" transform="rotate(-35 -165 40)"/>
+        <ellipse cx="165" cy="40" rx="45" ry="30" transform="rotate(35 165 40)"/>
+        <ellipse cx="-110" cy="5" rx="55" ry="60" transform="rotate(-20 -110 5)"/>
+        <ellipse cx="110" cy="5" rx="55" ry="60" transform="rotate(20 110 5)"/>
+        <ellipse cx="0" cy="-10" rx="75" ry="95"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top"><svg><use href="#wheat"/></svg>السنبلة</a>
+    <div class="nav-links">
+      <a href="#menu">المنيو</a>
+      <a href="#how">تطلب إزاي</a>
+      <a href="#info">المواعيد والتوصيل</a>
+      <a href="#faq">أسئلة</a>
+      <a href="#order">اطلب</a>
+    </div>
+    <div class="nav-end">
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="غيّر الوضع">🌙</button>
+      <button class="cart-btn" id="cartBtn" type="button" aria-label="السلة">
+        السلة <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="hero-stick" id="heroStick">
+    <div class="hero-text">
+      <span class="badge"><span class="dot" id="openDot"></span><span id="openText">...</span></span>
+      <h1>مخبز السنبلة</h1>
+      <p class="lead">عيش وحلويات طازة كل يوم، من فرننا لبيتك.</p>
+      <div class="cta-row">
+        <a class="btn btn-main" href="#menu">الحق اطلب قبل ما تخلص</a>
+        <a class="btn btn-ghost" href="#info">مواعيدنا</a>
+      </div>
+    </div>
+
+    <div class="bite-stage" id="biteStage">
+      <svg class="croissant" id="bigCroissant" viewBox="-230 -150 460 300" role="img" aria-label="كرواسون بيتاكل وإنت بتنزل في الصفحة">
+        <defs>
+          <mask id="biteMask" maskUnits="userSpaceOnUse" x="-230" y="-150" width="460" height="300">
+            <rect x="-230" y="-150" width="460" height="300" fill="#fff"/>
+            <g id="bites" fill="#000"></g>
+          </mask>
+        </defs>
+        <g mask="url(#biteMask)">
+          <g fill="url(#crustG)" stroke="#8a4f1d" stroke-width="4">
+            <ellipse cx="-170" cy="45" rx="48" ry="30" transform="rotate(-35 -170 45)"/>
+            <ellipse cx="170" cy="45" rx="48" ry="30" transform="rotate(35 170 45)"/>
+            <ellipse cx="-112" cy="8" rx="58" ry="64" transform="rotate(-20 -112 8)"/>
+            <ellipse cx="112" cy="8" rx="58" ry="64" transform="rotate(20 112 8)"/>
+            <ellipse cx="0" cy="-8" rx="80" ry="100"/>
+          </g>
+          <!-- flaky layer lines -->
+          <g fill="none" stroke="#9a5a22" stroke-width="3" stroke-linecap="round" opacity=".55">
+            <path d="M-40 -90 Q0 -70 40 -90"/>
+            <path d="M-55 -40 Q0 -15 55 -40"/>
+            <path d="M-55 15 Q0 40 55 15"/>
+            <path d="M-45 65 Q0 85 45 65"/>
+            <path d="M-140 -30 Q-120 0 -140 40"/>
+            <path d="M140 -30 Q120 0 140 40"/>
+          </g>
+          <!-- shine -->
+          <ellipse cx="-20" cy="-60" rx="22" ry="38" fill="#fff" opacity=".28"/>
+          <ellipse cx="-115" cy="-20" rx="12" ry="22" fill="#fff" opacity=".22"/>
+        </g>
+      </svg>
+      <div class="bite-label" id="biteLabel">لسه طازة من الفرن 🔥</div>
+    </div>
+
+    <div class="scroll-hint">انزل… وشوف الكرواسون بيخلص<span>⌄</span></div>
+  </div>
+</header>
+
+<!-- TRUST -->
+<section class="trust" aria-label="ليه السنبلة">
+  <div class="wrap trust-row">
+    <div class="trust-item reveal"><span class="ti" aria-hidden="true">🌾</span><div><b>بنخبز كل يوم الصبح بدري</b><small>مفيش حاجة عندنا بايتة</small></div></div>
+    <div class="trust-item reveal"><span class="ti" aria-hidden="true">🛵</span><div><b>توصيل لحد 3 كيلو</b><small>أقل طلب للتوصيل 100 جنيه</small></div></div>
+    <div class="trust-item reveal"><span class="ti" aria-hidden="true">💵</span><div><b>الدفع عند الاستلام</b><small>كاش أو إنستاباي</small></div></div>
+  </div>
+</section>
+
+<!-- MENU -->
+<section class="block" id="menu">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>المنيو بتاع النهارده</h2>
+      <p>كله اتخبز الصبح بدري، ومفيش حاجة عندنا بايتة.</p>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+</section>
+
+<!-- HOW TO ORDER -->
+<section class="block" id="how">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>تطلب إزاي؟</h2>
+      <p>3 خطوات وطلبك يبقى عندك.</p>
+    </div>
+    <ol class="steps">
+      <li class="step reveal"><span class="num">1</span><h3>اختار</h3><p>ضيف اللي نفسك فيه من المنيو للسلة.</p></li>
+      <li class="step reveal"><span class="num">2</span><h3>توصيل ولا استلام؟</h3><p>نوصّلك في حدود 3 كيلو (أقل طلب 100 جنيه)، أو تعدّي تاخده من المخبز.</p></li>
+      <li class="step reveal"><span class="num">3</span><h3>ادفع وإنت بتستلم</h3><p>كاش أو إنستاباي، مفيش دفع أونلاين.</p></li>
+    </ol>
+    <p class="steps-note reveal">عايز تورتة عيد ميلاد؟ احجزها قبلها بيومين على الأقل.</p>
+  </div>
+</section>
+
+<!-- INFO -->
+<section class="block" id="info">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>إمتى وفين؟</h2>
+      <p>مخبز عيلة صغير، تعالالنا أو نوصّلك.</p>
+    </div>
+    <div class="info">
+      <div class="tile reveal">
+        <h3>المواعيد</h3>
+        <table>
+          <tr id="rowWeek"><td>السبت للخميس</td><td>7 الصبح – 11 بالليل</td></tr>
+          <tr id="rowFri"><td>الجمعة</td><td>2 الضهر – 11 بالليل</td></tr>
+        </table>
+      </div>
+      <div class="tile reveal">
+        <h3>العنوان والتوصيل</h3>
+        <ul>
+          <li>12 شارع النخيل، جنب الصيدلية</li>
+          <li>موبايل: <span dir="ltr">0100 000 0000</span></li>
+          <li>بنوصّل في حدود 3 كيلو</li>
+          <li>أقل طلب للتوصيل 100 جنيه</li>
+        </ul>
+      </div>
+      <div class="tile reveal">
+        <h3>تعرف قبل ما تطلب</h3>
+        <ul>
+          <li>الدفع كاش أو إنستاباي عند الاستلام</li>
+          <li>مفيش دفع أونلاين</li>
+          <li>مفيش أكل من غير جلوتين</li>
+          <li>التورتة بتتحجز قبلها بيومين</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="block" id="faq">
+  <div class="narrow" style="margin-inline:auto">
+    <div class="section-head reveal">
+      <h2>أسئلة بتتسأل كتير</h2>
+      <p>لو سؤالك مش هنا، كلمنا.</p>
+    </div>
+    <div class="faq">
+      <details class="reveal"><summary>مواعيدكم إيه؟</summary><p>من السبت للخميس من 7 الصبح لحد 11 بالليل، والجمعة من 2 الضهر لحد 11 بالليل.</p></details>
+      <details class="reveal"><summary>بتوصّلوا لحد فين؟</summary><p>بنوصّل في حدود 3 كيلو، وأقل طلب للتوصيل 100 جنيه. ولو بعيد، تقدر تعدّي تستلم من المخبز.</p></details>
+      <details class="reveal"><summary>ينفع أدفع أونلاين؟</summary><p>لأ، مفيش دفع أونلاين. الدفع كاش أو إنستاباي عند الاستلام.</p></details>
+      <details class="reveal"><summary>التورتة بتتحجز إمتى؟</summary><p>قبلها بيومين على الأقل. السعر بيبدأ من 450 جنيه وبيتحدد حسب الطلب.</p></details>
+      <details class="reveal"><summary>عندكم أكل من غير جلوتين؟</summary><p>للأسف لأ، مفيش عندنا أكل من غير جلوتين.</p></details>
+      <details class="reveal"><summary>فيه منيو إنجليزي؟</summary><p>لأ، المنيو بالعربي بس.</p></details>
+      <details class="reveal"><summary>العيش طازة فعلاً؟</summary><p>بنخبز كل يوم الصبح بدري، ومفيش حاجة عندنا بايتة.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ORDER -->
+<section class="block" id="order">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>طلبك</h2>
+      <p>اختار، وإحنا نجهّز. الدفع عند الاستلام.</p>
+    </div>
+    <div class="order">
+      <div class="panel reveal">
+        <h3>السلة</h3>
+        <ul class="cart-list" id="cartList"></ul>
+        <div class="totals" id="totals"></div>
+        <div class="goal" id="goal" hidden>
+          <div class="goal-text" id="goalText"></div>
+          <div class="goal-bar"><span id="goalFill"></span></div>
+        </div>
+      </div>
+
+      <div class="panel reveal">
+        <h3>بياناتك</h3>
+        <form id="orderForm" novalidate>
+          <div class="seg" role="radiogroup" aria-label="طريقة الاستلام">
+            <input type="radio" name="mode" id="mDel" value="توصيل" checked><label for="mDel">توصيل</label>
+            <input type="radio" name="mode" id="mPick" value="استلام من المخبز"><label for="mPick">استلام من المخبز</label>
+          </div>
+          <label>الاسم <input name="name" required maxlength="100" autocomplete="name"></label>
+          <label>الموبايل <input name="phone" required minlength="7" maxlength="20" inputmode="tel" autocomplete="tel" dir="ltr" style="text-align:right"></label>
+          <label id="addrWrap">العنوان <input name="address" maxlength="200" autocomplete="street-address"></label>
+          <div class="seg" role="radiogroup" aria-label="طريقة الدفع">
+            <input type="radio" name="pay" id="pCash" value="كاش" checked><label for="pCash">كاش</label>
+            <input type="radio" name="pay" id="pInsta" value="إنستاباي"><label for="pInsta">إنستاباي</label>
+          </div>
+          <label id="cakeDateWrap" style="display:none">ميعاد استلام التورتة
+            <input type="date" name="cakeDate" id="cakeDate">
+            <span class="date-hint">التورتة بتتحجز قبلها بيومين على الأقل.</span>
+          </label>
+          <label>ملاحظات <textarea name="notes" rows="3" maxlength="300" placeholder="مثلاً: تورتة مكتوب عليها اسم..."></textarea></label>
+          <button class="btn btn-main" type="submit" id="submitBtn">ابعت الطلب</button>
+          <div class="status" id="status" role="status"></div>
+          <p class="fineprint">الدفع عند الاستلام، كاش أو إنستاباي.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <div class="display">السنبلة</div>
+      <div>عيش وحلويات طازة كل يوم، من فرننا لبيتك.</div>
+    </div>
+    <div>12 شارع النخيل، جنب الصيدلية · <span dir="ltr">0100 000 0000</span></div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- Supabase config: fill these to connect the form ---------- */
+const SUPABASE_URL = "https://rzaotdkygqmskwjmezpr.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_j9anBVcKPw3n3ZMdpINF0A_nzet5Jx5"; // public publishable key (insert-only via RLS)
+const MESSAGES_TABLE = "messages";
+
+const DELIVERY_MIN = 100;
+
+/* product art (simple inline drawings) */
+const ART = {
+  fino: `<svg viewBox="0 0 160 120"><g stroke="#8a4f1d" stroke-width="3">
+    <rect x="15" y="62" width="130" height="34" rx="17" fill="url(#crustG)" transform="rotate(-8 80 79)"/>
+    <rect x="15" y="34" width="130" height="34" rx="17" fill="url(#crustG)" transform="rotate(6 80 51)"/></g>
+    <g stroke="#fff" stroke-width="3" opacity=".6" stroke-linecap="round"><path d="M50 40 l10 14M80 42 l10 14M110 46 l10 14"/></g></svg>`,
+  baladi: `<svg viewBox="0 0 160 120"><ellipse cx="80" cy="66" rx="66" ry="40" fill="url(#crustG)" stroke="#8a4f1d" stroke-width="3"/>
+    <ellipse cx="80" cy="60" rx="50" ry="26" fill="#f6d79a" opacity=".55"/>
+    <g fill="#c9a37a"><circle cx="60" cy="58" r="3"/><circle cx="92" cy="52" r="3"/><circle cx="104" cy="68" r="3"/><circle cx="72" cy="74" r="3"/></g></svg>`,
+  croissant: `<svg viewBox="0 0 160 120"><use href="#croissantSm" x="5" y="10" width="150" height="100"/></svg>`,
+  choco: `<svg viewBox="0 0 160 120"><use href="#croissantSm" x="5" y="10" width="150" height="100"/>
+    <path d="M40 50 q20 -14 40 0 t40 0" stroke="url(#chocoG)" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <path d="M50 70 q15 -10 30 0 t30 0" stroke="url(#chocoG)" stroke-width="6" fill="none" stroke-linecap="round"/></svg>`,
+  basbousa: `<svg viewBox="0 0 160 120"><path d="M20 50 L140 50 L140 92 L20 92 Z" fill="#e3a94f" stroke="#8a4f1d" stroke-width="3"/>
+    <path d="M20 50 L50 30 L170 30 L140 50 Z" fill="#f6d79a" stroke="#8a4f1d" stroke-width="3" transform="translate(-10 0)"/>
+    <g stroke="#9a5a22" stroke-width="2" opacity=".6"><path d="M60 50v42M100 50v42M20 71h120"/></g>
+    <g fill="#fff"><ellipse cx="40" cy="61" rx="5" ry="3"/><ellipse cx="80" cy="61" rx="5" ry="3"/><ellipse cx="120" cy="61" rx="5" ry="3"/><ellipse cx="40" cy="82" rx="5" ry="3"/><ellipse cx="80" cy="82" rx="5" ry="3"/><ellipse cx="120" cy="82" rx="5" ry="3"/></g></svg>`,
+  cake: `<svg viewBox="0 0 160 120"><rect x="30" y="58" width="100" height="44" rx="8" fill="url(#crustG)" stroke="#8a4f1d" stroke-width="3"/>
+    <path d="M30 66 q12 12 25 0 t25 0 t25 0 t25 0" fill="#fff8ec" stroke="#8a4f1d" stroke-width="2"/>
+    <g stroke="#8a4f1d" stroke-width="3"><rect x="56" y="34" width="8" height="24" rx="2" fill="#fff"/><rect x="76" y="30" width="8" height="28" rx="2" fill="#fff"/><rect x="96" y="34" width="8" height="24" rx="2" fill="#fff"/></g>
+    <g fill="#f39c12"><path d="M60 22 q6 8 0 12 q-6 -4 0 -12z"/><path d="M80 18 q6 8 0 12 q-6 -4 0 -12z"/><path d="M100 22 q6 8 0 12 q-6 -4 0 -12z"/></g></svg>`
+};
+
+/* only facts from bakery-facts.md */
+const PRODUCTS = [
+  { id: "fino",     name: "عيش فينو",          unit: "5 أرغفة",   price: 15 },
+  { id: "baladi",   name: "عيش بلدي مخصوص",    unit: "5 أرغفة",   price: 10 },
+  { id: "croissant",name: "كرواسون سادة",       unit: "القطعة",     price: 20 },
+  { id: "choco",    name: "كرواسون شوكولاتة",   unit: "القطعة",     price: 28 },
+  { id: "basbousa", name: "بسبوسة",             unit: "الكيلو",     price: 160 },
+  { id: "cake",     name: "تورتة عيد ميلاد",    unit: "حسب الطلب", price: 450, from: true,
+    note: "بالحجز قبلها بيومين، والسعر النهائي حسب الطلب" }
+];
+
+const $ = s => document.querySelector(s);
+const fmt = n => n.toLocaleString("ar-EG") + " جنيه";
+const cart = {};      // id -> qty
+const pick = {};      // id -> qty selected on card
+
+/* ---------- render products ---------- */
+const grid = $("#grid");
+PRODUCTS.forEach((p, i) => {
+  pick[p.id] = 1;
+  const el = document.createElement("article");
+  el.className = "card reveal";
+  el.style.transitionDelay = (i % 3) * 90 + "ms";
+  el.innerHTML = `
+    <div class="art">${ART[p.id]}</div>
+    <h3>${p.name}</h3>
+    <div class="unit">${p.unit}</div>
+    <div class="price">${p.from ? "من " : ""}${fmt(p.price)}</div>
+    ${p.note ? `<div class="note">${p.note}</div>` : ""}
+    <div class="actions">
+      <div class="qty">
+        <button type="button" data-q="+1" aria-label="زوّد">+</button>
+        <span id="q-${p.id}">1</span>
+        <button type="button" data-q="-1" aria-label="قلّل">−</button>
+      </div>
+      <button class="add" type="button">${p.from ? "احجز" : "ضيف للسلة"}</button>
+    </div>`;
+  el.querySelectorAll("[data-q]").forEach(b => b.onclick = () => {
+    pick[p.id] = Math.max(1, Math.min(99, pick[p.id] + Number(b.dataset.q)));
+    $("#q-" + p.id).textContent = pick[p.id];
+  });
+  el.querySelector(".add").onclick = () => {
+    cart[p.id] = (cart[p.id] || 0) + pick[p.id];
+    flyToCart(el.querySelector(".art svg"));
+    renderCart();
+    toast(`${p.name} اتضاف للسلة`);
+  };
+  grid.appendChild(el);
+});
+
+function flyToCart(svg) {
+  const from = svg.getBoundingClientRect();
+  const to = $("#cartBtn").getBoundingClientRect();
+  const clone = svg.cloneNode(true);
+  clone.classList.add("fly");
+  clone.style.left = from.left + from.width / 2 - 23 + "px";
+  clone.style.top = from.top + from.height / 2 - 23 + "px";
+  document.body.appendChild(clone);
+  requestAnimationFrame(() => {
+    clone.style.transform = `translate(${to.left - from.left - from.width / 2 + 40}px, ${to.top - from.top - from.height / 2 + 10}px) scale(.4) rotate(360deg)`;
+    clone.style.opacity = ".2";
+  });
+  setTimeout(() => {
+    clone.remove();
+    const b = $("#cartBtn"); b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump");
+  }, 800);
+}
+
+/* ---------- cart ---------- */
+function cartTotal() {
+  return PRODUCTS.reduce((s, p) => s + (cart[p.id] || 0) * p.price, 0);
+}
+function isDelivery() { return $("#mDel").checked; }
+
+function renderCart() {
+  const list = $("#cartList");
+  const items = PRODUCTS.filter(p => cart[p.id]);
+  $("#cartCount").textContent = items.reduce((s, p) => s + cart[p.id], 0);
+  list.innerHTML = "";
+  if (!items.length) {
+    list.innerHTML = `<li class="empty" style="display:block;border:0"><svg viewBox="-220 -140 440 280"><use href="#croissantSm"/></svg>السلة فاضية… الكرواسون مستنيك</li>`;
+    $("#totals").innerHTML = "";
+    renderExtras();
+    return;
+  }
+  items.forEach(p => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span>${p.name} × ${cart[p.id]} <small style="color:var(--muted)">(${p.unit})</small></span>
+      <span><b>${p.from ? "من " : ""}${fmt(cart[p.id] * p.price)}</b>
+      <button class="rm" type="button" aria-label="شيل">✕</button></span>`;
+    li.querySelector(".rm").onclick = () => { delete cart[p.id]; renderCart(); };
+    list.appendChild(li);
+  });
+  const total = cartTotal();
+  const hasCake = !!cart.cake;
+  $("#totals").innerHTML = `<div class="row grand"><span>الإجمالي${hasCake ? " (تقريبي)" : ""}</span><span>${fmt(total)}</span></div>`;
+  renderExtras();
+}
+
+/* Cairo calendar date, offset by N days, as YYYY-MM-DD */
+function cairoDate(offsetDays) {
+  const [y, m, d] = new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Cairo" }).format(new Date()).split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d + offsetDays)).toISOString().slice(0, 10);
+}
+
+/* delivery-minimum progress + cake date field */
+function renderExtras() {
+  const total = cartTotal(), goal = $("#goal");
+  goal.hidden = !(isDelivery() && total > 0);
+  if (!goal.hidden) {
+    const done = total >= DELIVERY_MIN;
+    goal.classList.toggle("done", done);
+    $("#goalText").textContent = done ? "✓ طلبك كده ينفع يتوصّل" : `ناقصك ${fmt(DELIVERY_MIN - total)} وتوصلك لحد البيت`;
+    $("#goalFill").style.width = Math.min(100, total / DELIVERY_MIN * 100) + "%";
+  }
+  const hasCake = !!cart.cake, date = $("#cakeDate");
+  $("#cakeDateWrap").style.display = hasCake ? "" : "none";
+  date.min = cairoDate(2);
+  date.required = hasCake;
+}
+document.querySelectorAll('input[name="mode"]').forEach(r => r.onchange = () => {
+  $("#addrWrap").style.display = isDelivery() ? "" : "none";
+  renderExtras();
+});
+$("#cartBtn").onclick = () => $("#order").scrollIntoView({ behavior: "smooth" });
+
+/* ---------- submit to Supabase ---------- */
+$("#orderForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const f = e.target, st = $("#status");
+  const show = (cls, msg) => { st.className = "status " + cls; st.textContent = msg; };
+  const items = PRODUCTS.filter(p => cart[p.id]);
+  const total = cartTotal();
+  const name = f.name.value.trim(), phone = f.phone.value.trim(), address = f.address.value.trim();
+
+  if (!items.length) return show("err", "السلة فاضية، ضيف حاجة الأول.");
+  if (!name || !phone) return show("err", "محتاجين الاسم والموبايل.");
+  if (phone.length < 7) return show("err", "رقم الموبايل مش مظبوط.");
+  if (isDelivery() && !address) return show("err", "اكتب العنوان عشان نوصّلك.");
+  if (isDelivery() && total < DELIVERY_MIN) return show("err", `أقل طلب للتوصيل ${fmt(DELIVERY_MIN)}.`);
+  const cakeDate = f.cakeDate.value;
+  if (cart.cake && (!cakeDate || cakeDate < cairoDate(2))) return show("err", "التورتة بتتحجز قبلها بيومين على الأقل، اختار ميعاد مناسب.");
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return show("err", "الفورم لسه مش متوصل بقاعدة البيانات، الطلب ما اتبعتش.");
+
+  const lines = items.map(p => `- ${p.name} × ${cart[p.id]} (${p.unit}) = ${p.from ? "من " : ""}${cart[p.id] * p.price} جنيه`);
+  const message = [
+    `طلب جديد (${f.mode.value})`,
+    ...lines,
+    `الإجمالي: ${total} جنيه${cart.cake ? " (تقريبي)" : ""}`,
+    `الدفع: ${f.pay.value} عند الاستلام`,
+    cart.cake ? `ميعاد التورتة: ${cakeDate}` : "",
+    isDelivery() ? `العنوان: ${address}` : "",
+    f.notes.value.trim() ? `ملاحظات: ${f.notes.value.trim()}` : ""
+  ].filter(Boolean).join("\n");
+
+  const btn = $("#submitBtn");
+  btn.disabled = true; btn.textContent = "بنبعت...";
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${MESSAGES_TABLE}`, {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({ name, phone, message })
+    });
+    if (!res.ok) throw new Error(await res.text());
+    show("ok", "طلبك وصل! هنكلمك نأكد معاك. 🥐");
+    Object.keys(cart).forEach(k => delete cart[k]);
+    renderCart(); f.reset(); $("#addrWrap").style.display = "";
+  } catch (err) {
+    console.error(err);
+    show("err", "حصلت مشكلة والطلب ما اتبعتش. جرّب تاني أو كلمنا.");
+  } finally {
+    btn.disabled = false; btn.textContent = "ابعت الطلب";
+  }
+});
+
+/* ---------- open / closed (Cairo time) ---------- */
+(function openStatus() {
+  const parts = new Intl.DateTimeFormat("en-US", { timeZone: "Africa/Cairo", weekday: "short", hour: "numeric", hour12: false }).formatToParts(new Date());
+  const day = parts.find(x => x.type === "weekday").value;
+  const hour = Number(parts.find(x => x.type === "hour").value) % 24;
+  const isFri = day === "Fri";
+  const openAt = isFri ? 14 : 7, closeAt = 23;
+  const open = hour >= openAt && hour < closeAt;
+  $("#openDot").classList.add(open ? "open" : "closed");
+  $("#openText").textContent = open ? "فاتحين دلوقتي · لحد 11 بالليل" : (hour < openAt ? `قافلين · بنفتح ${isFri ? "2 الضهر" : "7 الصبح"}` : "قافلين · بنفتح بكرة");
+  $(isFri ? "#rowFri" : "#rowWeek").classList.add("today");
+})();
+
+/* ---------- the croissant gets eaten as you scroll ---------- */
+const BITES = [
+  // [threshold, cx, cy, r]
+  [0.06, -215, -10, 55], [0.12, -190, 70, 50], [0.18, -175, -80, 50],
+  [0.26, -120, 20, 62],  [0.32, -95, -95, 55], [0.38, -90, 105, 55],
+  [0.46, -40, -30, 70],  [0.54, -20, 95, 62],  [0.60, -5, -115, 60],
+  [0.70, 40, 10, 72],    [0.76, 55, -100, 58], [0.82, 50, 110, 58]
+];
+const LABELS = [
+  [0,    "لسه طازة من الفرن 🔥"],
+  [0.06, "قضمة أولى… 😋"],
+  [0.26, "طب حتة كمان"],
+  [0.46, "نصها راح!"],
+  [0.70, "ربعها بس اللي فاضل… الحق!"]
+];
+const NS = "http://www.w3.org/2000/svg";
+const bitesG = $("#bites");
+const biteEls = BITES.map(([, cx, cy]) => {
+  const c = document.createElementNS(NS, "circle");
+  c.setAttribute("cx", cx); c.setAttribute("cy", cy); c.setAttribute("r", 0);
+  bitesG.appendChild(c);
+  // small teeth scallops around each bite for a real "bite" edge
+  return c;
+});
+const eaten = BITES.map(() => false);
+let lastLabel = -1;
+
+function heroProgress() {
+  const hero = $("#top");
+  const max = hero.offsetHeight - innerHeight;
+  return Math.min(1, Math.max(0, -hero.getBoundingClientRect().top / max));
+}
+function crumbs(cx, cy) {
+  const svg = $("#bigCroissant").getBoundingClientRect();
+  const stage = $("#biteStage").getBoundingClientRect();
+  const sx = svg.width / 460, sy = svg.height / 300;
+  const x = svg.left - stage.left + (cx + 230) * sx;
+  const y = svg.top - stage.top + (cy + 150) * sy;
+  for (let i = 0; i < 12; i++) {
+    const d = document.createElement("span");
+    const s = 4 + Math.random() * 9;
+    d.className = "crumb";
+    d.style.cssText = `width:${s}px;height:${s * .8}px;left:${x + (Math.random() - .5) * 50}px;top:${y + (Math.random() - .5) * 40}px;--dx:${(Math.random() - .5) * 160}px;background:${Math.random() > .5 ? "#e3a94f" : "#c07a2c"}`;
+    $("#biteStage").appendChild(d);
+    setTimeout(() => d.remove(), 2400);
+  }
+}
+function animateR(el, to) {
+  const start = performance.now(), from = Number(el.getAttribute("r"));
+  (function step(t) {
+    const k = Math.min(1, (t - start) / 520);
+    const e = 1 - Math.pow(1 - k, 3);
+    el.setAttribute("r", from + (to - from) * e);
+    if (k < 1) requestAnimationFrame(step);
+  })(start);
+}
+function updateBites() {
+  const p = heroProgress();
+  BITES.forEach(([th, cx, cy, r], i) => {
+    const should = p >= th;
+    if (should !== eaten[i]) {
+      eaten[i] = should;
+      animateR(biteEls[i], should ? r : 0);
+      if (should) crumbs(cx, cy);
+    }
+  });
+  let idx = 0;
+  LABELS.forEach(([th], i) => { if (p >= th) idx = i; });
+  if (idx !== lastLabel) {
+    lastLabel = idx;
+    const lab = $("#biteLabel");
+    lab.textContent = LABELS[idx][1];
+    lab.classList.remove("swap"); void lab.offsetWidth; lab.classList.add("swap");
+  }
+}
+let ticking = false;
+addEventListener("scroll", () => {
+  if (!ticking) { ticking = true; requestAnimationFrame(() => { updateBites(); ticking = false; }); }
+}, { passive: true });
+addEventListener("resize", updateBites);
+
+/* floating wheat in the hero background */
+(function wheatRain() {
+  const stick = $("#heroStick");
+  for (let i = 0; i < 7; i++) {
+    const w = document.createElementNS(NS, "svg");
+    w.setAttribute("class", "wheat");
+    w.setAttribute("viewBox", "0 0 40 100");
+    w.innerHTML = '<use href="#wheat"/>';
+    w.style.left = Math.random() * 100 + "%";
+    w.style.animationDuration = 28 + Math.random() * 24 + "s";
+    w.style.animationDelay = -Math.random() * 40 + "s";
+    w.style.width = 34 + Math.random() * 40 + "px";
+    stick.prepend(w);
+  }
+})();
+
+/* ---------- reveal on scroll ---------- */
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+}), { threshold: .15 });
+document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+
+/* ---------- toast ---------- */
+let tt;
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(tt); tt = setTimeout(() => t.classList.remove("show"), 1800);
+}
+
+/* ---------- dark / light ---------- */
+function syncThemeBtn() {
+  const dark = document.documentElement.dataset.theme === "dark";
+  $("#themeBtn").textContent = dark ? "☀️" : "🌙";
+  $("#themeBtn").setAttribute("aria-label", dark ? "الوضع الفاتح" : "الوضع الغامق");
+}
+$("#themeBtn").onclick = () => {
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem("sunbula-theme", next); } catch (e) {}
+  syncThemeBtn();
+};
+syncThemeBtn();
+
+renderCart();
+updateBites();
+</script>
+</body>
+</html>
